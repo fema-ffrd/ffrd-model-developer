@@ -15,35 +15,31 @@ This script has two primary functions:
 
 For more information on USDA Soil Data Web Services, please visit the USDA NRCS Web Services help page
 
-==============================
+==============================  
 Two primary functions exists in spatially_varied_curve_numbers.py: 
 
-spatially_varied_curve_numbers(aoi_path, output_path)
-        aoi_path (str):     Path to the input vector file defining the study area;
-                            file format must be supported by Fiona (see geopandas.read_file() for more information)
+**spatially_varied_curve_numbers(aoi_path, output_path)**  
 
-        output_path (str):  Path to the desired output where the vector file will be saved;
-                            the file format is determined by the file extension (e.g., .shp, .gpkg, etc);
-                            file format must be any OGR data source supported by Fiona  (see geopandas.GeoDataFrame.to_file() for more information)
+Description: This function downloads SSURGO soil survey data from the USDA NRCS Soil Data WFS and saves the data to a vector file.  
+
+- aoi_path (str):     Path to the input vector file defining the study area; file format must be supported by Fiona (see geopandas.read_file() for more information)  
+- output_path (str):  Path to the desired output where the vector file will be saved; the file format is determined by the file extension (e.g., .shp, .gpkg, etc); file format must be any OGR data source supported by Fiona  (see geopandas.GeoDataFrame.to_file() for more information)
         
-        Description:        This function downloads SSURGO soil survey data from the USDA NRCS Soil Data WFS
-                            and saves the data to a vector file.
 
-get_soils_hydro_group(soils_path, output_path):
-        soils_path (str):   Path to the input ssurgo soils vector file; typically previously downloaded with spatially_varied_curve_numbers();
-                            file format must be supported by Fiona (see geopandas.read_file() for more information)
 
-        output_path (str):  Path to the desired output where the vector file will be saved;
-                            the file format is determined by the file extension (e.g., .shp, .gpkg, etc);
-                            file format must be any OGR data source supported by Fiona  (see geopandas.GeoDataFrame.to_file() for more information);
-                            component soil data and hydrologic group classification data are saved to CSV files in the same folder as the output vector file
+**get_soils_hydro_group(soils_path, output_path)** 
 
-        Description:        This function downloads the component soil data of interest (mukey, comppct_r, hydgrp) from the USDA NRCS 
+Description:        This function downloads the component soil data of interest (mukey, comppct_r, hydgrp) from the USDA NRCS 
                             https://SDMDataAccess.sc.egov.usda.gov/Tabular/post.rest for the mukey values in the input ssurgo soils vector data. 
                             Based on the max comppct_r grouped by hydgrp for each mukey, a hydrologic group (hydgrp) is determined for each mukey.
                             The component soil data and hydrologic group classification data are saved to CSV files
                             (component_source_data.csv and hydrogroup_data.csv, respectively). The hydrogroup data is merged with the the soils data
-                            downloaded from the WFS and saved to an output vector file.
+                            downloaded from the WFS and saved to an output vector file. 
+                            
+- soils_path (str):   Path to the input ssurgo soils vector file;   typically previously downloaded with spatially_varied_curve_numbers();  
+file format must be supported by Fiona (see geopandas.read_file() for more information)
+- output_path (str):  Path to the desired output where the vector file will be saved; the file format is determined by the file extension (e.g., .shp, .gpkg, etc); file format must be any OGR data source supported by Fiona  (see geopandas.GeoDataFrame.to_file() for more information); component soil data and hydrologic group classification data are saved to CSV files in the same folder as the output vector file
+ 
 
 Example Usage: See /workspaces/fema-open-source-temp/example_usage/run_get_ssurgo_soils.py
 

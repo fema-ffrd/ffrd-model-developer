@@ -65,9 +65,7 @@ def get_failed_data(failed_url_list: list, gdf_ssurgo: list):
     """
     try:
         rerun_gdf = map(get_data, failed_url_list)
-        rerun_results = [
-            result[0] for result in rerun_gdf if result[0] is not None
-        ]
+        rerun_results = [result[0] for result in rerun_gdf if result[0] is not None]
         gdf_ssurgo.extend(rerun_results)
         return gdf_ssurgo
     except Exception as e:
@@ -75,7 +73,6 @@ def get_failed_data(failed_url_list: list, gdf_ssurgo: list):
 
 
 def create_url(min_x: float, min_y: float, max_x: float, max_y: float) -> str:
-
     """
     This function creates a URL for the SSURGO WFS
     based on the bounding box of the study area.
@@ -152,7 +149,7 @@ def get_soils_hydro_group(soils_path: str, output_directory: str):
     downloaded from the WFS and saved to an output vector file.
 
     Args:
-        soils_path (str):   Path to the input ssurgo soils vector file; typically previously downloaded with spatially_varied_curve_numbers();
+        soils_path (str):   Path to the input ssurgo soils vector file; typically previously downloaded with acquire_ssurgo_data();
                             file format must be supported by Fiona (see geopandas.read_file() for more information)
 
         output_directory (str):  Path to the desired output where the vector file will be saved;
@@ -228,7 +225,9 @@ def get_soils_hydro_group(soils_path: str, output_directory: str):
         soils_gdf = soils_gdf[["Soil_Class", "geometry"]]
 
         # write the output to a vector file
-        output_soils_classes = os.path.join(output_directory, "ssurgo_soil_classes.gpkg")
+        output_soils_classes = os.path.join(
+            output_directory, "ssurgo_soil_classes.gpkg"
+        )
         soils_gdf.to_file(output_soils_classes)
 
     else:
@@ -236,9 +235,7 @@ def get_soils_hydro_group(soils_path: str, output_directory: str):
         print(response.text)  # This will print the error message if any
 
 
-
-def spatially_varied_curve_numbers(aoi_path: str, output_directory: str):
-
+def acquire_ssurgo_data(aoi_path: str, output_directory: str):
     """
     This function downloads SSURGO soil survey data from the USDA NRCS Soil Data WFS
     and saves the data to a vector file.
@@ -287,17 +284,16 @@ def spatially_varied_curve_numbers(aoi_path: str, output_directory: str):
     num_cores = mp.cpu_count()
     with mp.Pool(int(num_cores / 4)) as pool:
         results = pool.map(get_data, url_list)
-    
+
         # Get the geodataframes and failed urls
-    gdf_ssurgo = [result[0]
-                    for result in results if result[0] is not None]
+    gdf_ssurgo = [result[0] for result in results if result[0] is not None]
 
     failed_url_list = [
         failed_url[1] for failed_url in results if failed_url[1] is not None
     ]
 
     print(f"Results for {len(results)} of {len(url_list)} tiles collected")
-    
+
     # Retry failed URLs
     if failed_url_list:
         print("Retrying failed URLs...")
@@ -305,7 +301,9 @@ def spatially_varied_curve_numbers(aoi_path: str, output_directory: str):
 
     # Check if any data was retrieved
     if not any(not gdf.empty for gdf in gdf_ssurgo):
-        raise Exception("The API is not responding or no data was retrieved. Wait and try again.")
+        raise Exception(
+            "The API is not responding or no data was retrieved. Wait and try again."
+        )
 
     # Concat the geodataframes
     merged_gdf = pd.concat(gdf_ssurgo, ignore_index=True)
@@ -327,23 +325,19 @@ def spatially_varied_curve_numbers(aoi_path: str, output_directory: str):
     # Export the data
     print("Exporting SSURGO data results...")
     output_ssurgo = os.path.join(output_directory, "ssurgo_data.gpkg")
-    soils_gdf.to_file(
-        output_ssurgo, driver="GPKG"
-    )
+    soils_gdf.to_file(output_ssurgo, driver="GPKG")
 
     return output_ssurgo
 
 
 def generate_soils_classes(input_aoi_file: str, output_directory: str):
-    """Download SSURGO soil survey data from the USDA NRCS Soil Data WFS, then convert to 
+    """Download SSURGO soil survey data from the USDA NRCS Soil Data WFS, then convert to
     hydrologic group classification data and save to output directory
 
     Args:
         input_aoi_file (str): Path to the input vector file defining the study area
         output_directory (str): Path to the desired output directory where various datasets will be saved
     """
-        
-    downloaded_ssurgo = spatially_varied_curve_numbers(input_aoi_file, output_directory)
+
+    downloaded_ssurgo = acquire_ssurgo_data(input_aoi_file, output_directory)
     get_soils_hydro_group(downloaded_ssurgo, output_directory)
-
-
