@@ -57,7 +57,7 @@ nlcd_downloader_converter.py
 Example Usage: See /workspaces/fema-open-source-temp/example_usage/run_nlcd_downloader_converter.py
 
 This script can be used to  download NLCD_2021_Land_Cover_L48 (US) landcover from www.mrlc.gov WCS within the extent of an 
-input polygon vector file. Downloaded NLCD data is also converted to Mannings n values using the provided input CSV file.
+input polygon vector file. Downloaded NLCD data is then converted to Mannings n values using either a user-provided input CSV file or a default mannings-n values by NLCD code.
 Images for large extents are downloaded in tiles and then merged together. The output tif image is in WGS 84; EPSG:4326 
 coordinate system.
 
@@ -67,17 +67,13 @@ This code was largely built off of the LandCoverDownloader provided in the githu
 NLCD Downloader Reference: https://github.com/reirby/LandCoverDownloader
 This was utilized through an MIT License provided within the repo.
 
-One primary function exists in nlcd_downloader_converter.py: 
+One primary function exists in nlcd_downloader_converter.py:  
 
-def get_nlcd_and_convert(aoi_path, output_directory, nlcd_classifications_path = None)
-        aoi_path (str): The path to the file containing area of interest. The full extent will be used to subset the NLCD data.
-        file format must be supported by Fiona (see geopandas.read_file() for more information)
-
-        output_directory (str): The path to the directory where the output tif files will be saved.
-        
-        nlcd_classifications_path (str): The path to the CSV file that contains the Mannings n values for each NLCD classification.
-            CSV column headers should be: 'value', 'nlcd_name', 'mannings_n'
-            If no csv file is provided, a default one will be generated using the function mock_csv_file()
+**get_nlcd_and_convert(aoi_path, output_directory, nlcd_classifications_path = None)**  
+- aoi_path (str): The path to the file containing area of interest. The full extent will be used to subset the NLCD data. File format must be supported by Fiona (see geopandas.read_file() for more information)
+- output_directory (str): The path to the directory where the output tif files will be saved.
+- nlcd_classifications_path (str): The path to the CSV file that contains the Mannings n values for each NLCD classification.CSV column headers should be: 'value', 'nlcd_name', 'mannings_n'
+If no csv file is provided, a default one will be generated using the function mock_csv_file()
 
 
 NLCD Legend Reference: https://www.mrlc.gov/data/legends/national-land-cover-database-class-legend-and-description
